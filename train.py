@@ -44,7 +44,7 @@ class Evaluate:
             test_items = test[user]
             other_items = self.all_items - train_items.union(test_items)
             for idx in test_items:
-                random_items = random.sample(other_items, 200)
+                random_items = random.sample(other_items, 500)
                 random_items.append(idx)
                 rec_movies = self.recommend(user, random_items)
                 for n in N:
@@ -68,8 +68,9 @@ class Evaluate:
         predict_y = self.model.evaluate(test_list)
         # ====================评分乘上标准差加上平均值====================
         for [user, rating] in predict_y:
-            y_pred.append(rating * self.user_avg_std[user]['user_std'] + self.user_avg_std[user][
-                'user_avg'])
+            pred_r = rating * self.user_avg_std[user]['user_std'] + self.user_avg_std[user][
+                'user_avg']
+            y_pred.append(np.clip(pred_r, 1, 5) if pred_r < 0 or pred_r > 6 else pred_r)
         rmse = np.sqrt(np.sum(np.power(np.array(y_true) - np.array(y_pred), 2)) / len(y_true))
         mse = np.sum(np.abs(np.array(y_true) - np.array(y_pred))) / len(y_true)
         print('rmse:%.6f\tmse:%.6f' % (rmse, mse))
@@ -77,8 +78,8 @@ class Evaluate:
 
 if __name__ == '__main__':
     # =================train model======================
-    UPCC = model.UPCC()
-
-    test = Evaluate(UPCC)
+    # model.IPCC()
+    #==================选择模型=============================
+    test = Evaluate(model.UPCC())
     test.rmse_and_mae()
     test.rec([5, 10, 15, 20, 30, 50])
