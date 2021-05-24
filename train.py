@@ -44,7 +44,7 @@ class Evaluate:
             test_items = test[user]
             other_items = self.all_items - train_items.union(test_items)
             for idx in test_items:
-                random_items = random.sample(other_items, 500)
+                random_items = random.sample(other_items, 200)
                 random_items.append(idx)
                 rec_movies = self.recommend(user, random_items)
                 for n in N:
@@ -80,6 +80,6 @@ if __name__ == '__main__':
     # =================train model======================
     # model.IPCC()
     #==================选择模型=============================
-    test = Evaluate(model.UPCC())
+    test = Evaluate(model.UIPCC())
     test.rmse_and_mae()
     test.rec([5, 10, 15, 20, 30, 50])

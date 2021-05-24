@@ -4,9 +4,9 @@ from tqdm import tqdm
 
 
 class DataSet:
-    def __init__(self, file='./data/ml-100k/u.data'):
+    def __init__(self, file='./data/ml-1m/ratings.dat'):
         np.random.seed(0)
-        self.data_df = pd.read_csv(file, sep="	", engine='python',
+        self.data_df = pd.read_csv(file, sep="::", engine='python',
                                    names=['UserId', 'MovieId', 'Rating', 'Timestamp'])
 
     @staticmethod
@@ -24,8 +24,8 @@ class DataSet:
         self.data_df['user_avg'] = self.data_df.groupby('UserId')['Rating'].transform('mean')
         self.data_df['user_std'] = self.data_df.groupby('UserId')['Rating'].transform('std')
         self.data_df['norm_R'] = (self.data_df['Rating'] - self.data_df['user_avg']) / self.data_df['user_std']
-
-
+        self.data_df['norm_noise_R'] = self.data_df['norm_R'] + np.random.uniform(low=-alpha, high=alpha,
+                                                                                  size=len(self.data_df))
 
         # 划分训练集和测试集
         watch_count = self.data_df.groupby(by='UserId')['MovieId'].agg('count')  # 用户观看电影次数
@@ -40,7 +40,7 @@ class DataSet:
         train_df = self.data_df.drop(labels=test_df['index'])
         train_df = train_df.drop(['Timestamp'], axis=1).sample(frac=1.).reset_index(drop=True)
         test_df = test_df.drop(['index', 'Timestamp'], axis=1).sample(frac=1.).reset_index(drop=True)
-        train = train_df[['UserId', 'MovieId', 'norm_R']].values
+        train = train_df[['UserId', 'MovieId', 'norm_noise_R']].values
         test = test_df[['UserId', 'MovieId', 'Rating']].values
         return feature_columns, train, test
 

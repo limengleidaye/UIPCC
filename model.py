@@ -18,6 +18,7 @@ class UIPCC():
         self.movie_count = 0
         self.user_count = 0
 
+        self.get_dataset()
         # ==================Init=======================================
         self.UPCC = UPCC()
         self.IPCC = IPCC()
@@ -35,7 +36,6 @@ class UIPCC():
         self.IPCC.user_count = self.user_count
 
         # =================得到数据集，计算相似度================================
-        self.get_dataset()
         self.cal_sim()
 
     def get_dataset(self):
@@ -100,7 +100,7 @@ class IPCC():
         self.user_count = 0
 
         # =================得到数据集，计算相似度================================
-        # self.get_dataset()
+        #self.get_dataset()
         self.cal_movie_sim()
 
     # 读文件得到“用户-电影”数据
@@ -142,11 +142,12 @@ class IPCC():
                 same_users = s_users & g_users
                 if len(same_users) != 0:
                     sum_numerator = sum(self.trainSet[user][s] * self.trainSet[user][g] for user in same_users)
-                    sum_denominator = np.sqrt(len(s_users) * len(g_users))
+                    sum_denominator = np.sqrt(sum(pow(self.trainSet[user][s], 2) for user in same_users)) * np.sqrt(
+                        sum(pow(self.trainSet[user][g], 2) for user in same_users))
                     self.movie_sim_matrix.setdefault(s, {})
                     self.movie_sim_matrix[s].setdefault(g, 0)
                     self.movie_sim_matrix[s][g] = sum_numerator / sum_denominator
-        print('Build user similarity matrix success!')
+        print('Build movie similarity matrix success!')
 
     def predict(self, user, list):
         predict_dict = {}
@@ -163,7 +164,7 @@ class IPCC():
             #                sorted(self.movie_sim_matrix[user].items(), key=lambda x: x[1], reverse=True)[:80]]
             for nei in movies:
                 try:
-                    if nei in self.movie_sim_matrix[movie].keys():
+                    if nei in self.movie_sim_matrix[movie].keys() and self.movie_sim_matrix[movie][nei] > 0.009:
                         temp_sum_upper += self.movie_sim_matrix[movie][nei] * self.trainSet[user][nei]
                         temp_sum_down += self.movie_sim_matrix[movie][nei]
                 except Exception:
@@ -185,13 +186,13 @@ class IPCC():
             temp_sum_down = 0  # 分母
             for nei in movies:
                 try:
-                    if nei in self.movie_sim_matrix[movie].keys():
+                    if nei in self.movie_sim_matrix[movie].keys() and self.movie_sim_matrix[movie][nei] > 0.009:
                         temp_sum_upper += self.movie_sim_matrix[movie][nei] * self.trainSet[user][nei]
                         temp_sum_down += self.movie_sim_matrix[movie][nei]
                 except Exception:
                     pass
             if temp_sum_down != 0:
-                predict_list.append([user, np.clip(temp_sum_upper / temp_sum_down, 0.5, 5.5)])
+                predict_list.append([user, temp_sum_upper / temp_sum_down])
             else:
                 predict_list.append([user, 0])
         return predict_list
@@ -212,7 +213,7 @@ class UPCC():
         self.user_count = 0
 
         # =================得到数据集，计算相似度================================
-        self.get_dataset()
+        #self.get_dataset()
         self.cal_user_sim()
 
     # 读文件得到“用户-电影”数据
@@ -274,7 +275,7 @@ class UPCC():
             # simest_neis = [item[0] for item in
             #                sorted(self.user_sim_matrix[user].items(), key=lambda x: x[1], reverse=True)[:80]]
             for nei in users:
-                if nei in self.user_sim_matrix[user].keys():
+                if nei in self.user_sim_matrix[user].keys() and self.user_sim_matrix[user][nei] > 0.009:
                     temp_sum_upper += self.user_sim_matrix[user][nei] * self.trainSet[nei][movie]
                     temp_sum_down += self.user_sim_matrix[user][nei]
             if temp_sum_down != 0:
@@ -293,7 +294,7 @@ class UPCC():
             temp_sum_upper = 0  # 分子
             temp_sum_down = 0  # 分母
             for nei in users:
-                if nei in self.user_sim_matrix[user].keys():
+                if nei in self.user_sim_matrix[user].keys() and self.user_sim_matrix[user][nei] > 0.009:
                     temp_sum_upper += self.user_sim_matrix[user][nei] * self.trainSet[nei][movie]
                     temp_sum_down += self.user_sim_matrix[user][nei]
             if temp_sum_down != 0:
