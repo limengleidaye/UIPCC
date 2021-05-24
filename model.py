@@ -160,6 +160,7 @@ class UPCC():
                 users = self.movie_user[movie]
             except Exception:
                 # print('no one has watched the movie ',movie)
+                predict_list.append([user, 0])
                 continue
             temp_sum_upper = 0  # 分子
             temp_sum_down = 0  # 分母

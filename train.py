@@ -70,8 +70,8 @@ class Evaluate:
         for [user, rating] in predict_y:
             y_pred.append(rating * self.user_avg_std[user]['user_std'] + self.user_avg_std[user][
                 'user_avg'])
-        rmse = np.sqrt(np.sum(np.power(np.ndarray(y_true) - np.ndarray(y_pred), 2)) / len(y_true))
-        mse = np.sum(np.abs(np.ndarray(y_true) - np.ndarray(y_pred))) / len(y_true)
+        rmse = np.sqrt(np.sum(np.power(np.array(y_true) - np.array(y_pred), 2)) / len(y_true))
+        mse = np.sum(np.abs(np.array(y_true) - np.array(y_pred))) / len(y_true)
         print('rmse:%.6f\tmse:%.6f' % (rmse, mse))
 
 

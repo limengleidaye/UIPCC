@@ -17,7 +17,7 @@ class DataSet:
     def denseFeature(feat):
         return {'feat': feat}
 
-    def create_explicit_ml_1m_dataset(self, test_size=0.8):
+    def create_explicit_ml_1m_dataset(self, test_size=0.2):
         # =======================参数=============================
         alpha = 0.5  # 噪声的均匀分布幅度
         # ===================归一化================================
