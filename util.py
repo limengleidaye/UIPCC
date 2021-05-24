@@ -4,7 +4,7 @@ from tqdm import tqdm
 
 
 class DataSet:
-    def __init__(self, file):
+    def __init__(self, file='./data/ml-1m/ratings.dat'):
         np.random.seed(0)
         self.data_df = pd.read_csv(file, sep="::", engine='python',
                                    names=['UserId', 'MovieId', 'Rating', 'Timestamp'])
@@ -17,13 +17,13 @@ class DataSet:
     def denseFeature(feat):
         return {'feat': feat}
 
-    def create_explicit_ml_1m_dataset(self, test_size=0.2):
+    def create_explicit_ml_1m_dataset(self, test_size=0.8):
         # =======================参数=============================
         alpha = 0.5  # 噪声的均匀分布幅度
         # ===================归一化================================
         self.data_df['user_avg'] = self.data_df.groupby('UserId')['Rating'].transform('mean')
-        self.data_df['user_var'] = self.data_df.groupby('UserId')['Rating'].transform('var')
-        self.data_df['norm_R'] = (self.data_df['Rating'] - self.data_df['user_avg']) / self.data_df['user_var']
+        self.data_df['user_std'] = self.data_df.groupby('UserId')['Rating'].transform('std')
+        self.data_df['norm_R'] = (self.data_df['Rating'] - self.data_df['user_avg']) / self.data_df['user_std']
 
 
 
@@ -45,4 +45,4 @@ class DataSet:
         return feature_columns, train, test
 
     def get_mean_std(self):
-        return self.data_df[['UserId', 'user_avg', 'user_var']].drop_duplicates()
+        return self.data_df[['UserId', 'user_avg', 'user_std']].drop_duplicates()
