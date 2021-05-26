@@ -44,14 +44,14 @@ class Evaluate:
             test_items = test[user]
             other_items = self.all_items - train_items.union(test_items)
             for idx in test_items:
-                random_items = random.sample(other_items, 200)
+                random_items = random.sample(other_items, 500)
                 random_items.append(idx)
                 rec_movies = self.recommend(user, random_items)
                 for n in N:
                     hits[n] += int(idx in rec_movies[:n])
                     # rec_count += n
-                test_count += len(test_items)
-                # precision = hit / (1.0 * rec_count)
+            test_count += len(test_items)
+            # precision = hit / (1.0 * rec_count)
         for n in N:
             recall = hits[n] / (1.0 * test_count)
             print('N:%d\trecall=%.6f\t' % (n, recall))
@@ -79,7 +79,11 @@ class Evaluate:
 if __name__ == '__main__':
     # =================train model======================
     # model.IPCC()
-    #==================选择模型=============================
-    test = Evaluate(model.UIPCC())
+    # ==================选择模型=============================
+    m = model.UIPCC()
+    m.get_dataset()
+    m.cal_sim()
+
+    test = Evaluate(m)
     test.rmse_and_mae()
     test.rec([5, 10, 15, 20, 30, 50])

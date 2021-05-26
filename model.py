@@ -18,25 +18,13 @@ class UIPCC():
         self.movie_count = 0
         self.user_count = 0
 
-        self.get_dataset()
+
+        #self.get_dataset()
         # ==================Init=======================================
         self.UPCC = UPCC()
         self.IPCC = IPCC()
-        self.UPCC.trainSet = self.trainSet
-        self.UPCC.testSet = self.testSet
-        self.UPCC.user_avg_std = self.user_avg_std
-        self.UPCC.movie_user = self.movie_user
-        self.UPCC.movie_count = self.movie_count
-        self.UPCC.user_count = self.user_count
-        self.IPCC.trainSet = self.trainSet
-        self.IPCC.testSet = self.testSet
-        self.IPCC.user_avg_std = self.user_avg_std
-        self.IPCC.movie_user = self.movie_user
-        self.IPCC.movie_count = self.movie_count
-        self.IPCC.user_count = self.user_count
-
         # =================得到数据集，计算相似度================================
-        self.cal_sim()
+        #self.cal_sim()
 
     def get_dataset(self):
         dataset = DataSet()
@@ -64,6 +52,20 @@ class UIPCC():
         print('Build movie-user table success!')
 
         self.user_avg_std = dataset.get_mean_std().set_index('UserId').to_dict('index')
+
+
+        self.UPCC.trainSet = self.trainSet
+        self.UPCC.testSet = self.testSet
+        self.UPCC.user_avg_std = self.user_avg_std
+        self.UPCC.movie_user = self.movie_user
+        self.UPCC.movie_count = self.movie_count
+        self.UPCC.user_count = self.user_count
+        self.IPCC.trainSet = self.trainSet
+        self.IPCC.testSet = self.testSet
+        self.IPCC.user_avg_std = self.user_avg_std
+        self.IPCC.movie_user = self.movie_user
+        self.IPCC.movie_count = self.movie_count
+        self.IPCC.user_count = self.user_count
 
     def cal_sim(self):
         self.UPCC.cal_user_sim()
@@ -101,7 +103,7 @@ class IPCC():
 
         # =================得到数据集，计算相似度================================
         #self.get_dataset()
-        self.cal_movie_sim()
+        #self.cal_movie_sim()
 
     # 读文件得到“用户-电影”数据
     def get_dataset(self):
@@ -214,7 +216,7 @@ class UPCC():
 
         # =================得到数据集，计算相似度================================
         #self.get_dataset()
-        self.cal_user_sim()
+        #self.cal_user_sim()
 
     # 读文件得到“用户-电影”数据
     def get_dataset(self):
