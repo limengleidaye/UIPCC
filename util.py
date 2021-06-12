@@ -19,7 +19,7 @@ class DataSet:
 
     def create_explicit_ml_1m_dataset(self, test_size=0.2):
         # =======================参数=============================
-        alpha = 0.5  # 噪声的均匀分布幅度
+        alpha = 1  # 噪声的均匀分布幅度
         # ===================归一化================================
         self.data_df['user_avg'] = self.data_df.groupby('UserId')['Rating'].transform('mean')
         self.data_df['user_std'] = self.data_df.groupby('UserId')['Rating'].transform('std')
@@ -28,11 +28,13 @@ class DataSet:
                                                                                   size=len(self.data_df))
 
         # 划分训练集和测试集
-        watch_count = self.data_df.groupby(by='UserId')['MovieId'].agg('count')  # 用户观看电影次数
-        test_df = pd.concat([
-            self.data_df[self.data_df.UserId == i].iloc[int((1 - test_size) * watch_count[i]):] for i in
-            tqdm(watch_count.index)],
-            axis=0)
+        self.data_df['random'] = np.random.random(size=len(self.data_df))
+        test_df = self.data_df[self.data_df['random'] < test_size]
+        # watch_count = self.data_df.groupby(by='UserId')['MovieId'].agg('count')  # 用户观看电影次数
+        # test_df = pd.concat([
+        #     self.data_df[self.data_df.UserId == i].iloc[int((1 - test_size) * watch_count[i]):] for i in
+        #     tqdm(watch_count.index)],
+        #     axis=0)
         user_num, item_num = self.data_df['UserId'].max(), self.data_df['MovieId'].max()
         feature_columns = [DataSet.sparseFeature('user_id', user_num),
                            DataSet.sparseFeature('item_id', item_num)]

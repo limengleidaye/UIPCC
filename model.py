@@ -68,8 +68,8 @@ class UIPCC():
         self.IPCC.user_count = self.user_count
 
     def cal_sim(self):
-        self.UPCC.cal_user_sim()
-        self.IPCC.cal_movie_sim()
+        self.UPCC.cal_sim()
+        self.IPCC.cal_sim()
 
     def predict(self, user, list):
         upcc_predict = self.UPCC.predict(user, list)
@@ -134,7 +134,7 @@ class IPCC():
         self.user_avg_std = dataset.get_mean_std().set_index('UserId').to_dict('index')
 
     # 计算电影之间的相似度
-    def cal_movie_sim(self):
+    def cal_sim(self):
         # key = movieID, value = list of userIDs who have seen this movie
         print('Building movie sim table ...')
         for s, s_users in tqdm(self.movie_user.items()):
@@ -247,7 +247,7 @@ class UPCC():
         self.user_avg_std = dataset.get_mean_std().set_index('UserId').to_dict('index')
 
     # 计算用户之间的相似度
-    def cal_user_sim(self):
+    def cal_sim(self):
         # key = movieID, value = list of userIDs who have seen this movie
         print('Building user sim table ...')
         for u, u_movies in tqdm(self.trainSet.items()):
