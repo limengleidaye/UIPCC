@@ -4,9 +4,9 @@ from tqdm import tqdm
 
 
 class DataSet:
-    def __init__(self, file='./data/ml-1m/ratings.dat'):
+    def __init__(self, file='./data/ml-100k/u.data'):
         np.random.seed(0)
-        self.data_df = pd.read_csv(file, sep="::", engine='python',
+        self.data_df = pd.read_csv(file, sep="	", engine='python',
                                    names=['UserId', 'MovieId', 'Rating', 'Timestamp'])
 
     @staticmethod
