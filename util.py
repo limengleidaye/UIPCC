@@ -42,7 +42,7 @@ class DataSet:
         train_df = self.data_df.drop(labels=test_df['index'])
         train_df = train_df.drop(['Timestamp'], axis=1).sample(frac=1.).reset_index(drop=True)
         test_df = test_df.drop(['index', 'Timestamp'], axis=1).sample(frac=1.).reset_index(drop=True)
-        train = train_df[['UserId', 'MovieId', 'norm_R']].values
+        train = train_df[['UserId', 'MovieId', 'norm_noise_R']].values
         test = test_df[['UserId', 'MovieId', 'Rating']].values
         return feature_columns, train, test
 

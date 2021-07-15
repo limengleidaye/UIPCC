@@ -44,7 +44,7 @@ class Evaluate:
             test_items = test[user]
             other_items = self.all_items - train_items.union(test_items)
             for idx in test_items:
-                random_items = random.sample(other_items, 500)
+                random_items = random.sample(other_items, 200)
                 random_items.append(idx)
                 rec_movies = self.recommend(user, random_items, rev=True)
                 for n in N:
@@ -73,7 +73,7 @@ class Evaluate:
             y_pred.append(np.clip(pred_r, 1, 5) if pred_r < 0 or pred_r > 6 else pred_r)
         rmse = np.sqrt(np.sum(np.power(np.array(y_true) - np.array(y_pred), 2)) / len(y_true))
         mse = np.sum(np.abs(np.array(y_true) - np.array(y_pred))) / len(y_true)
-        print('rmse:%.6f\tmse:%.6f' % (rmse, mse))
+        print('rmse:%.6f\tmae:%.6f' % (rmse, mse))
 
     def auc(self, Nu):
         test = {}
@@ -89,7 +89,7 @@ class Evaluate:
             test_items = test[user_id]
             other_items = self.all_items - train_items.union(test_items)
             Pu = len(test_items)
-            random_items = random.sample(other_items, 100)
+            random_items = random.sample(other_items, Nu)
             random_items = random_items + list(test_items)
             sort_values = self.recommend(user_id, random_items, rev=False)
             rank_sum = 0
@@ -97,7 +97,8 @@ class Evaluate:
                 rank_sum += sort_values.index(i) + 1
             auc_u = (rank_sum - Pu * (Pu + 1) / 2) / (Pu * Nu)
             AUC += auc_u
-        print("AUC:%.5f\t" % (AUC/test_count))
+        print("AUC:%.5f\t" % (AUC / test_count))
+
 
 if __name__ == '__main__':
     # =================train model======================
@@ -109,5 +110,5 @@ if __name__ == '__main__':
 
     test = Evaluate(m)
     test.rmse_and_mae()
-    #test.rec([5, 10, 15, 20, 30, 50])
-    test.auc(100)
+    test.rec([5, 10, 15, 20, 25, 30, 35])
+    test.auc(200)
