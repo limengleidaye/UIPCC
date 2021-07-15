@@ -18,9 +18,9 @@ class Evaluate:
         self.user_avg_std = model.user_avg_std
         return
 
-    def recommend(self, user, list):
+    def recommend(self, user, list, rev):
         return [item[0] for item in
-                sorted(self.model.predict(user, list).items(), key=lambda x: x[1], reverse=True)]
+                sorted(self.model.predict(user, list).items(), key=lambda x: x[1], reverse=rev)]
 
     def rec(self, N):
         print("Evaluation start ...", N)
@@ -46,7 +46,7 @@ class Evaluate:
             for idx in test_items:
                 random_items = random.sample(other_items, 500)
                 random_items.append(idx)
-                rec_movies = self.recommend(user, random_items)
+                rec_movies = self.recommend(user, random_items, rev=True)
                 for n in N:
                     hits[n] += int(idx in rec_movies[:n])
                     # rec_count += n
@@ -75,6 +75,29 @@ class Evaluate:
         mse = np.sum(np.abs(np.array(y_true) - np.array(y_pred))) / len(y_true)
         print('rmse:%.6f\tmse:%.6f' % (rmse, mse))
 
+    def auc(self, Nu):
+        test = {}
+        for user, movies in self.test.items():
+            for movie in movies:
+                if self.test[user][movie] > 4:
+                    test[user] = set()
+                    test[user].add(movie)
+        test_count = len(test)
+        AUC = 0
+        for user_id in tqdm(test):
+            train_items = set(self.train[user_id].keys())
+            test_items = test[user_id]
+            other_items = self.all_items - train_items.union(test_items)
+            Pu = len(test_items)
+            random_items = random.sample(other_items, 100)
+            random_items = random_items + list(test_items)
+            sort_values = self.recommend(user_id, random_items, rev=False)
+            rank_sum = 0
+            for i in test_items:
+                rank_sum += sort_values.index(i) + 1
+            auc_u = (rank_sum - Pu * (Pu + 1) / 2) / (Pu * Nu)
+            AUC += auc_u
+        print("AUC:%.5f\t" % (AUC/test_count))
 
 if __name__ == '__main__':
     # =================train model======================
@@ -86,4 +109,5 @@ if __name__ == '__main__':
 
     test = Evaluate(m)
     test.rmse_and_mae()
-    test.rec([5, 10, 15, 20, 30, 50])
+    #test.rec([5, 10, 15, 20, 30, 50])
+    test.auc(100)
